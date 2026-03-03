@@ -1,0 +1,13 @@
+{
+  "name": "promptforge-json",
+  "version": "1.0.0",
+  "description": "Generador de prompts en JSON para APIs de IA",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
+
