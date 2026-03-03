@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>PromptForge JSON</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 16px; background: #0f172a; color: #e5e7eb; }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; }
+    label { display: block; margin-top: 12px; font-size: 0.9rem; }
+    input, textarea, select { width: 100%; padding: 8px; margin-top: 4px; border-radius: 6px; border: 1px solid #334155; background: #020617; color: #e5e7eb; }
+    button { margin-top: 16px; width: 100%; padding: 10px; border-radius: 6px; border: none; background: #22c55e; color: #020617; font-weight: 600; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: default; }
+    pre { margin-top: 16px; padding: 12px; background: #020617; border-radius: 6px; overflow-x: auto; font-size: 0.8rem; }
+    .tag { display: inline-block; font-size: 0.7rem; padding: 2px 6px; border-radius: 999px; background: #1d4ed8; margin-left: 6px; }
+  </style>
+</head>
+<body>
+  <h1>PromptForge JSON <span class="tag">MVP</span></h1>
+  <p style="font-size:0.9rem;opacity:.8;">Genera prompts en JSON listos para APIs de IA (OpenAI, Gemini, etc.).</p>
+
+  <label>Título del prompt</label>
+  <input id="title" placeholder="Ej: Blogpost SEO sobre IA" />
+
+  <label>Descripción / Instrucciones</label>
+  <textarea id="description" rows="4" placeholder="Explica con detalle qué debe hacer la IA..."></textarea>
+
+  <label>Modelo</label>
+  <input id="model" value="gpt-4o-mini" />
+
+  <label>Temperature (0 - 1)</label>
+  <input id="temperature" type="number" step="0.1" min="0" max="1" value="0.7" />
+
+  <button id="generateBtn">Generar JSON</button>
+
+  <pre id="output">// Aquí verás tu JSON listo para copiar.</pre>
+
+  <script>
+    const btn = document.getElementById('generateBtn');
+    const output = document.getElementById('output');
+
+    btn.onclick = async () => {
+      btn.disabled = true;
+      btn.textContent = 'Generando...';
+
+      try {
+        const body = {
+          title: document.getElementById('title').value,
+          description: document.getElementById('description').value,
+          model: document.getElementById('model').value,
+          temperature: document.getElementById('temperature').value
+        };
+
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          output.textContent = 'Error: ' + (data.error || 'Error desconocido');
+        } else {
+          output.textContent = JSON.stringify(data.prompt, null, 2);
+        }
+      } catch (err) {
+        output.textContent = 'Error de red: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Generar JSON';
+      }
+    };
+  </script>
+</body>
+</html>
+
